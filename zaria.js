@@ -15,8 +15,9 @@ function Zaria(id, options) {
 
 	function __construct(id, options) {
 		Public.id = id;
-		Public.options = (options) ? options : defaults;
 		Public.prefix = "zaria-";
+		Public.frameId = Public.prefix + Public.id;
+		Public.options = (options) ? options : defaults;
 	}
 	
 	Public.build = function() {
@@ -28,31 +29,29 @@ function Zaria(id, options) {
 
 		if (document.designMode) {
 			textarea.style.display = 'none';
-			var id = Public.prefix + Public.id;
-
+			
 			var toolbar = Public.options.layout;
 			for (i in Public.options.buttons) {
-			
 				var button = "";
 				var buttonClass = (Public.options.buttons[i].className) ? Public.options.buttons[i].className : "";
 				if (Public.options.buttons[i].menu) {
-					button = '<select name="'+id+'" id="'+id+'-'+Public.options.buttons[i].cmd+'" class="'+buttonClass+'" title="'+Public.options.buttons[i].cmd+'"><option>Select '+Public.options.buttons[i].label+'</option>';
+					button = '<select name="'+Public.frameId+'" id="'+Public.frameId+'-'+Public.options.buttons[i].cmd+'" class="'+buttonClass+'" ><option>Select '+Public.options.buttons[i].label+'</option>';
 					for (j in Public.options.buttons[i].menu) { button += '<option value="'+Public.options.buttons[i].menu[j]['value']+'">'+Public.options.buttons[i].menu[j]['label']+'</option>'; }
 					button += '</select>';
 				} else {
-					button = '<a name="'+id+'" id="'+id+'-'+Public.options.buttons[i].cmd+'" rel="'+Public.options.buttons[i].cmd+'" class="'+buttonClass+'" width="20" height="20" alt="'+Public.options.buttons[i].label+'" title="'+Public.options.buttons[i].label+'" href="javascript:;" ></a>';
+					button = '<a name="'+Public.frameId+'" id="'+Public.frameId+'-'+Public.options.buttons[i].cmd+'" class="'+buttonClass+'" width="20" height="20" alt="'+Public.options.buttons[i].label+'" title="'+Public.options.buttons[i].label+'" href="javascript:;" ></a>';
 				}
 				toolbar = toolbar.replace("["+Public.options.buttons[i].name+"]", button);
 			}
-			var iframe = '<iframe id="'+id+'" width="'+width+'" height="'+height+'" style="width:'+width+'; height:'+height+'; border-width: thin;" class="'+className+'" frameborder="1"></iframe>';
+			var iframe = '<iframe id="'+Public.frameId+'" width="'+width+'" height="'+height+'" style="width:'+width+'; height:'+height+'; border-width: thin;" class="'+className+'" frameborder="1"></iframe>';
 			toolbar = toolbar.replace("[edit-area]", iframe);
 
 			var wrapperDiv = document.createElement('div');
 			wrapperDiv.innerHTML = toolbar;
 			Public.insertAfter(wrapperDiv, textarea);
-			Public.initButtons(id);
-
-			var doc = Public.getIFrameDocument(id);
+			Public.initButtons(Public.frameId);
+			
+			var doc = Public.getIFrameDocument(Public.frameId);
 			// Write the textarea's content into the iframe
 			doc.open();
 	      	doc.write('<html><head></head><body>'+content+'</body></html>');
@@ -66,12 +65,11 @@ function Zaria(id, options) {
 	
 	Public.getContents = function() {
 		if (document.designMode) {
-			var id = Public.prefix + Public.id;
 			// Explorer reformats HTML during document.write() removing quotes on element ID names
 			// so we need to address Explorer elements as window[elementID]
-			if (window[id]) 
-				return window[id].document.body.innerHTML;
-			return document.getElementById(id).contentWindow.document.body.innerHTML;
+			if (window[Public.frameId]) 
+				return window[Public.frameId].document.body.innerHTML;
+			return document.getElementById(Public.frameId).contentWindow.document.body.innerHTML;
 		} else {
 			// return the value from the <textarea> if document.designMode does not exist
 			return document.getElementById(Public.id).value;
@@ -79,9 +77,16 @@ function Zaria(id, options) {
 	}
 
 	Public.syncContent = function() {
-		var content = this.getContents();
-		document.getElementById(Public.id).value = content;
-		return content;
+		var textarea = document.getElementById(Public.id);
+		if (textarea.style.display == 'none') {
+			var content = this.getContents();
+			document.getElementById(Public.id).value = content;
+		} else {
+			var doc = Public.getIFrameDocument(Public.frameId);
+			doc.open();
+	      	doc.write('<html><head></head><body>'+document.getElementById(Public.id).value+'</body></html>');
+	  		doc.close();
+		}
 	}
 
 	Public.initButtons = function(id) {
@@ -92,10 +97,13 @@ function Zaria(id, options) {
 				currentElement.onmouseout = (Public.options.buttons[i].buttonMouseOut) ? Public.options.buttons[i].buttonMouseOut : null;
 				currentElement.onmousedown = (Public.options.buttons[i].buttonMouseDown) ? Public.options.buttons[i].buttonMouseDown : null;	
 				currentElement.onmouseup = Public.buttonMouseUp;
-				if (Public.options.buttons[i].menu)
-					currentElement.onchange = Public.selectOnChange;
-				else
-					currentElement.onclick = Public.buttonOnClick;
+				if (Public.options.buttons[i].menu) { 
+					currentElement.onchange = (function(element, buttonIndex) { return function() { Public.selectOnChange(element, Public.options.buttons[buttonIndex]) }; })(currentElement,i);
+				} else if (Public.options.buttons[i].prompt) {
+					currentElement.onclick = (function(buttonIndex) { return function() { Public.inputPrompt(Public.options.buttons[buttonIndex]) }; })(i);
+				} else {
+					currentElement.onclick = (function(buttonIndex) { return function() { Public.buttonOnClick(Public.options.buttons[buttonIndex]) }; })(i);
+				}
 			}
 		}
 	}
@@ -115,24 +123,46 @@ function Zaria(id, options) {
 		}
 	}
 
-	Public.buttonOnClick = function(e) {
+	Public.buttonOnClick = function(button) {
 		// Explorer reformats HTML during document.write() removing quotes on element ID names
 		// so we need to address Explorer elements as window[elementID]
-	   	var ea = (window[this.name]) ? window[this.name] : document.getElementById(this.name).contentWindow;
+	   	var ea = (window[Public.frameId]) ? window[Public.frameId] : document.getElementById(Public.frameId).contentWindow;
 		ea.focus();
-		ea.document.execCommand(this.rel, false, null);
+		ea.document.execCommand(button.cmd, false, null);
 		ea.focus();
 	}
 
-	Public.selectOnChange = function() {
-		var cursel = this.selectedIndex;
-		// First one is always a label 
+	Public.selectOnChange = function(element, button) {
+		var cursel = element.selectedIndex;
 		if (cursel != 0) {
-			var ea = (window[this.name]) ? window[this.name] : document.getElementById(this.name).contentWindow;
+			var ea = (window[Public.frameId]) ? window[Public.frameId] : document.getElementById(Public.frameId).contentWindow;
 			ea.focus();
-			ea.document.execCommand(this.title, false, this.options[cursel].value);
+			ea.document.execCommand(button.cmd, false, element.options[cursel].value);
 			ea.focus();
-			this.selectedIndex = 0;
+			element.selectedIndex = 0;
+		}
+	}
+
+	Public.inputPrompt = function(button) {
+		var value = prompt(button.prompt, "");
+		if (value) {
+			var ea = (window[Public.frameId]) ? window[Public.frameId] : document.getElementById(Public.frameId).contentWindow;
+			ea.focus();
+			ea.document.execCommand(button.cmd, false, value);
+			ea.focus();
+		}
+	}
+
+	Public.toggleHtml = function(button) {
+		var textarea = document.getElementById(Public.id);
+		var iframe = document.getElementById(Public.frameId).parentNode;
+		Public.syncContent();
+		if (textarea.style.display == 'none') {
+			textarea.style.display = 'block';
+			iframe.style.display = 'none';
+		} else {
+			textarea.style.display = 'none';
+			iframe.style.display = 'block';
 		}
 	}
 
@@ -144,7 +174,7 @@ function Zaria(id, options) {
 			return document.frames[id].document;
 		}
 	}
-	
+
 	Public.insertAfter = function(newElement,targetElement) {
 		var parent = targetElement.parentNode;
 		if(parent.lastchild == targetElement) {
@@ -154,5 +184,14 @@ function Zaria(id, options) {
 		}
 	}
 	
+	Public.getSelectedText = function() {
+		var doc = Public.getIFrameDocument(Public.frameId);
+		if (doc.getSelection) {
+			return doc.getSelection;
+		} else if (doc.document.selection) {
+			return doc.document.selection;
+		}
+	}
+
 	__construct.apply(this, arguments);	
 }

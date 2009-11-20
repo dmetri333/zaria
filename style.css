@@ -12,3 +12,5 @@
 .zariaToolbar a.justifyright { background-position: 0 -120px; }
 .zariaToolbar a.insertunorderedlist { background-position: 0 -140px; }
 .zariaToolbar a.insertorderedlist {	background-position: 0 -160px; }
+.zariaToolbar a.link { background-position: 0 -260px; }
+.zariaToolbar a.unlink { background-position: 0 -280px; }
