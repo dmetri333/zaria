@@ -8,19 +8,16 @@
 	<body>
 		<div>
 			<textarea id="default-id" name="default" style="width:520px; height:250px;"></textarea>
-			<div><input type="checkbox" onclick="defaultArea.toggleHtml();" />View Source </div>
 			<div><a href="#" onclick="getDefault();">Get Content</a></div>
 		</div>
 		<hr />
 		<div>
 			<textarea id="content-id" name="content" style="width:520px; height:250px;"></textarea>
-			<div><input type="checkbox" onclick="content.toggleHtml();" />View Source </div>
 			<div><a href="#" onclick="getContent();">Get Content</a></div>
 		</div>
-		
 		<script>
 			var options = {
-				layout: "<div class='zariaToolbar'>[bold][italic][underline][justify-left][justify-full][justify-center][justify-right][unordered-list][ordered-list][size][link][unlink]</div>[edit-area]",
+				layout: "<div class='zariaToolbar'>[bold][italic][underline][justify-left][justify-full][justify-center][justify-right][unordered-list][ordered-list][size][link][unlink][html]</div>[edit-area]",
 				buttons: [
 						{name:'bold', label:'Bold', cmd:'bold', className:'bold'},
 						{name:'italic', label:'Italic', cmd:'italic', className:'italic'},
@@ -34,7 +31,8 @@
 						{name:'font', label:'Font', cmd:'fontname', menu:[{label:'Arial', value:'Arial'},{label:'Courier', value:'Courier'},{label:'Times New Roman', value:'Times New Roman'}]},
 						{name:'size', label:'Size', cmd:'fontsize', menu:[{label:'12pt', value:'3'},{label:'24pt', value:'6'},{label:'36pt', value:'7'}]},
 						{name:'link', label:'Link', cmd:'createlink', className:'link', prompt:"Enter your URL: "},
-						{name:'unlink', label:'Unlink', cmd:'unlink', className:'unlink'}
+						{name:'unlink', label:'Unlink', cmd:'unlink', className:'unlink'},
+						{name:'html', label:'html toggle', toggleMode: true, className:'html'}
 				]
 			};
 

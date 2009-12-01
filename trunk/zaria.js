@@ -5,7 +5,7 @@
 function Zaria(id, options) {
 	var Public = this;
 	var defaults = {
-		layout: "<div class='zariaToolbar'>[bold][italic][underline]</div>[edit-area]</div>",
+		layout: "<div class='zariaToolbar'>[bold][italic][underline]</div>[edit-area]",
 		buttons: [
 			{name:'bold', label:'Bold', cmd:'bold', className:'bold'}, 
 			{name:'italic', label:'Italic', cmd:'italic', className:'italic'}, 
@@ -18,6 +18,7 @@ function Zaria(id, options) {
 		Public.prefix = "zaria-";
 		Public.frameId = Public.prefix + Public.id;
 		Public.options = (options) ? options : defaults;
+		Public.mode = 'text';
 	}
 	
 	Public.build = function() {
@@ -28,6 +29,7 @@ function Zaria(id, options) {
 		var className = textarea.className;
 
 		if (document.designMode) {
+			Public.mode = 'html';
 			textarea.style.display = 'none';
 			
 			var toolbar = Public.options.layout;
@@ -77,16 +79,23 @@ function Zaria(id, options) {
 	}
 
 	Public.syncContent = function() {
-		var textarea = document.getElementById(Public.id);
-		if (textarea.style.display == 'none') {
-			var content = this.getContents();
-			document.getElementById(Public.id).value = content;
+		var content = '';
+		if (Public.mode == 'text') {
+			var iframe = Public.getIFrameDocument(Public.frameId);
+			if (document.all) {
+				var output = escape(iframe.body.innerText);
+				output = output.replace("%3CP%3E%0D%0A%3CHR%3E", "%3CHR%3E");
+				output = output.replace("%3CHR%3E%0D%0A%3C/P%3E", "%3CHR%3E");
+				content = unescape(output);
+			} else {
+				var htmlSrc = iframe.body.ownerDocument.createRange();
+				htmlSrc.selectNodeContents(iframe.body);
+				content = htmlSrc.toString();
+			}
 		} else {
-			var doc = Public.getIFrameDocument(Public.frameId);
-			doc.open();
-	      	doc.write('<html><head></head><body>'+document.getElementById(Public.id).value+'</body></html>');
-	  		doc.close();
+			content = this.getContents();
 		}
+		document.getElementById(Public.id).value = content;
 	}
 
 	Public.initButtons = function(id) {
@@ -101,6 +110,10 @@ function Zaria(id, options) {
 					currentElement.onchange = (function(element, buttonIndex) { return function() { Public.selectOnChange(element, Public.options.buttons[buttonIndex]) }; })(currentElement,i);
 				} else if (Public.options.buttons[i].prompt) {
 					currentElement.onclick = (function(buttonIndex) { return function() { Public.inputPrompt(Public.options.buttons[buttonIndex]) }; })(i);
+				} else if (Public.options.buttons[i].toggleMode) {
+					currentElement.onclick = Public.toggleMode;
+				} else if (Public.options.buttons[i].custom) {
+					currentElement.onclick = Public.options.buttons[i].custom;
 				} else {
 					currentElement.onclick = (function(buttonIndex) { return function() { Public.buttonOnClick(Public.options.buttons[buttonIndex]) }; })(i);
 				}
@@ -109,10 +122,7 @@ function Zaria(id, options) {
 	}
 
 	Public.buttonMouseUp = function(e) {
-		// events for mouseDown on buttons
-		// e.g. this.style.xxx = xxx
-
-		// prevent default event (i.e. don't remove focus from text area)
+		// prevent default event (i.e. don't remove focus from textarea)
 		var evt = e ? e : window.event;
 		if (evt.returnValue) {
 			evt.returnValue = false;
@@ -153,16 +163,29 @@ function Zaria(id, options) {
 		}
 	}
 
-	Public.toggleHtml = function(button) {
-		var textarea = document.getElementById(Public.id);
-		var iframe = document.getElementById(Public.frameId).parentNode;
-		Public.syncContent();
-		if (textarea.style.display == 'none') {
-			textarea.style.display = 'block';
-			iframe.style.display = 'none';
+	Public.toggleMode = function() {
+		var iframe = Public.getIFrameDocument(Public.frameId);
+		if (Public.mode == 'html') {
+			if (document.all) {
+				iframe.body.innerText = iframe.body.innerHTML;
+			} else {
+				var htmlSrc = iframe.createTextNode(iframe.body.innerHTML);
+				iframe.body.innerHTML = "";
+				iframe.body.appendChild(htmlSrc);
+			}
+			Public.mode = 'text';
 		} else {
-			textarea.style.display = 'none';
-			iframe.style.display = 'block';
+			if (document.all) {
+				var output = escape(iframe.body.innerText);
+				output = output.replace("%3CP%3E%0D%0A%3CHR%3E", "%3CHR%3E");
+				output = output.replace("%3CHR%3E%0D%0A%3C/P%3E", "%3CHR%3E");
+				iframe.body.innerHTML = unescape(output);
+			} else {
+				var htmlSrc = iframe.body.ownerDocument.createRange();
+				htmlSrc.selectNodeContents(iframe.body);
+				iframe.body.innerHTML = htmlSrc.toString();
+			}
+			Public.mode = 'html';
 		}
 	}
 
@@ -175,7 +198,7 @@ function Zaria(id, options) {
 		}
 	}
 
-	Public.insertAfter = function(newElement,targetElement) {
+	Public.insertAfter = function(newElement, targetElement) {
 		var parent = targetElement.parentNode;
 		if(parent.lastchild == targetElement) {
 			parent.appendChild(newElement);
