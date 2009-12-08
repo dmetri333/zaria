@@ -56,7 +56,7 @@ function Zaria(id, options) {
 			var doc = Public.getIFrameDocument(Public.frameId);
 			// Write the textarea's content into the iframe
 			doc.open();
-	      	doc.write('<html><head></head><body>'+content+'</body></html>');
+			doc.write("<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'><html><head></head><body>"+content+"</body></html>");
 	  		doc.close();
  
 	    	// Make the iframe editable
@@ -95,6 +95,8 @@ function Zaria(id, options) {
 		} else {
 			content = this.getContents();
 		}
+		if (typeof(HTMLtoXML) != 'undefined')
+			content = HTMLtoXML(content);
 		document.getElementById(Public.id).value = content;
 	}
 
