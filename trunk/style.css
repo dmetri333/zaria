@@ -1,4 +1,4 @@
-.zariaToolbar { border: 1px solid #CCC; padding: 0px; width: 520px; height: 30px; margin-bottom: 2px; overflow: hidden; }
+.zariaToolbar { border: 1px solid #CCC; padding: 0px; width: 520px; margin-bottom: 2px; overflow: hidden; }
 .zariaToolbar a { margin: 5px 4px 4px 4px; cursor: pointer; float: left; display: block; background: transparent url(images/icons.gif) no-repeat scroll 0 0; width: 20px; height: 20px; text-indent: -999px; overflow: hidden; }
 .zariaToolbar a:hover { background-color: #CCC; }
 .zariaToolbar select { margin: 5px 4px 4px 4px; cursor: pointer; float: left; display: block; }

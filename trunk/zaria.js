@@ -18,7 +18,7 @@ function Zaria(id, options) {
 		Public.prefix = "zaria-";
 		Public.frameId = Public.prefix + Public.id;
 		Public.options = (options) ? options : defaults;
-		Public.mode = 'text';
+		Public.mode = null;
 	}
 	
 	Public.build = function() {
@@ -37,11 +37,11 @@ function Zaria(id, options) {
 				var button = "";
 				var buttonClass = (Public.options.buttons[i].className) ? Public.options.buttons[i].className : "";
 				if (Public.options.buttons[i].menu) {
-					button = '<select name="'+Public.frameId+'" id="'+Public.frameId+'-'+Public.options.buttons[i].cmd+'" class="'+buttonClass+'" ><option>Select '+Public.options.buttons[i].label+'</option>';
+					button = '<select name="'+Public.frameId+'" id="'+Public.frameId+'-'+Public.options.buttons[i].name+'" class="'+buttonClass+'" ><option>Select '+Public.options.buttons[i].label+'</option>';
 					for (j in Public.options.buttons[i].menu) { button += '<option value="'+Public.options.buttons[i].menu[j]['value']+'">'+Public.options.buttons[i].menu[j]['label']+'</option>'; }
 					button += '</select>';
 				} else {
-					button = '<a name="'+Public.frameId+'" id="'+Public.frameId+'-'+Public.options.buttons[i].cmd+'" class="'+buttonClass+'" width="20" height="20" alt="'+Public.options.buttons[i].label+'" title="'+Public.options.buttons[i].label+'" href="javascript:;" ></a>';
+					button = '<a name="'+Public.frameId+'" id="'+Public.frameId+'-'+Public.options.buttons[i].name+'" class="'+buttonClass+'" width="20" height="20" alt="'+Public.options.buttons[i].label+'" title="'+Public.options.buttons[i].label+'" href="javascript:;" ></a>';
 				}
 				toolbar = toolbar.replace("["+Public.options.buttons[i].name+"]", button);
 			}
@@ -102,7 +102,7 @@ function Zaria(id, options) {
 
 	Public.initButtons = function(id) {
 		for (i in Public.options.buttons) {
-			currentElement = document.getElementById(id+'-'+Public.options.buttons[i].cmd);
+			currentElement = document.getElementById(id+'-'+Public.options.buttons[i].name);
 			if (currentElement && currentElement.name == id) {
 				currentElement.onmouseover = (Public.options.buttons[i].buttonMouseOver) ? Public.options.buttons[i].buttonMouseOver : null;
 				currentElement.onmouseout = (Public.options.buttons[i].buttonMouseOut) ? Public.options.buttons[i].buttonMouseOut : null;
@@ -113,7 +113,7 @@ function Zaria(id, options) {
 				} else if (Public.options.buttons[i].prompt) {
 					currentElement.onclick = (function(buttonIndex) { return function() { Public.inputPrompt(Public.options.buttons[buttonIndex]) }; })(i);
 				} else if (Public.options.buttons[i].toggleMode) {
-					currentElement.onclick = Public.toggleMode;
+					currentElement.onclick = (function(element) { return function() { Public.toggleMode(element) }; })(currentElement);
 				} else if (Public.options.buttons[i].custom) {
 					currentElement.onclick = Public.options.buttons[i].custom;
 				} else {
@@ -165,9 +165,10 @@ function Zaria(id, options) {
 		}
 	}
 
-	Public.toggleMode = function() {
+	Public.toggleMode = function(element) {
 		var iframe = Public.getIFrameDocument(Public.frameId);
 		if (Public.mode == 'html') {
+			for (i in Public.options.buttons) { currentElement = document.getElementById(Public.frameId+'-'+Public.options.buttons[i].name); if (currentElement != element) {currentElement.style.display = 'none';} }
 			if (document.all) {
 				iframe.body.innerText = iframe.body.innerHTML;
 			} else {
@@ -177,6 +178,7 @@ function Zaria(id, options) {
 			}
 			Public.mode = 'text';
 		} else {
+			for (i in Public.options.buttons) { currentElement = document.getElementById(Public.frameId+'-'+Public.options.buttons[i].name); if (currentElement != element) {currentElement.style.display = '';} }
 			if (document.all) {
 				var output = escape(iframe.body.innerText);
 				output = output.replace("%3CP%3E%0D%0A%3CHR%3E", "%3CHR%3E");
@@ -206,15 +208,6 @@ function Zaria(id, options) {
 			parent.appendChild(newElement);
 		} else {
 			parent.insertBefore(newElement, targetElement.nextSibling);
-		}
-	}
-	
-	Public.getSelectedText = function() {
-		var doc = Public.getIFrameDocument(Public.frameId);
-		if (doc.getSelection) {
-			return doc.getSelection;
-		} else if (doc.document.selection) {
-			return doc.document.selection;
 		}
 	}
 
