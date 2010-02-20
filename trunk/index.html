@@ -38,14 +38,12 @@
 			};
 
 			var defaultArea = new Zaria('default-id');
-			defaultArea.build();
 			function getDefault() {
 				defaultArea.syncContent();
 				alert(document.getElementById('default-id').value);
 			}
 
 			var content = new Zaria('content-id', options);
-			content.build();
 			function getContent() {
 				content.syncContent();
 				alert(document.getElementById('content-id').value);
