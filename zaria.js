@@ -1,8 +1,7 @@
 /*
     Zaria - a simple web-based rich text editor
-    Copyright (C) 2008
+    Copyright (c)2010
 */
-
 var Zaria = (function(id, options) {
 	var defaults = {
 		layout: '<div class="zariaToolbar">[bold][italic][underline]</div>[edit-area]',
@@ -204,9 +203,8 @@ var Zaria = (function(id, options) {
 		this.frameId = this.prefix + this.id;
 		this.options = options || defaults;
 		this.mode = null;
-		
 		this.syncContent = syncContent;
-		
 		build.call(this);
 	};
+	
 })();
