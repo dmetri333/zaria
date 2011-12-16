@@ -50,10 +50,12 @@ var Zaria = (function(id, options) {
 			insertAfter(wrapperDiv, textarea);
 			initButtons.call(this, this.frameId);
 			
+			var cssOverride = (this.options.cssOverride) ? '<link rel="stylesheet" type="text/css" href="'+this.options.cssOverride+'" />' : '';
+			
 			doc = getIFrameDocument(this.frameId);
 			// Write the textarea's content into the iframe
 			doc.open();
-			doc.write('<html><head></head><body>'+content+'</body></html>');
+			doc.write('<html><head>'+cssOverride+'</head><body>'+content+'</body></html>');
 			doc.close();
 			
 			// Make the iframe editable
