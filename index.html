@@ -1,24 +1,44 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-		<title>Zaria Sample</title>
+		<title>Zaria Examples</title>
 		<link rel="stylesheet" type="text/css" href="style.css" />
+		<style>
+			h1 { font: 19px/21px Arial; margin: 0 0 20px 0; }
+			h2 { font: 16px/18px Arial; margin: 0 0 5px 0; }
+			.desc { font: 12px/14px Arial; margin: 0 0 10px 0; }
+			.textwrap { margin: 0 0 20px 0; }
+		</style>
 		<script language="javascript" type="text/javascript" src="zaria.js"></script>
 		<script language="javascript" type="text/javascript" src="htmlparser.js"></script>
 	</head>
 	<body>
-		<div>
+		<h1>Zaria Examples</h1>
+		
+		<h2>Default Setup</h2>
+		<div class="desc">This example shows zaria without a settings config</div>
+		<div class="textwrap">
 			<textarea id="default-id" name="default" style="width:520px; height:250px;"></textarea>
 			<div><a href="#" onclick="getDefault();">Get Content</a></div>
 		</div>
-		<hr />
-		<div>
-			<textarea id="content-id" name="content" style="width:520px; height:250px;"></textarea>
-			<div><a href="#" onclick="getContent();">Get Content</a></div>
+		
+		<h2>More Options</h2>
+		<div class="desc">More options are enabled using a settings config</div>
+		<div class="textwrap">
+			<textarea id="more-id" name="more" style="width:520px; height:250px;"></textarea>
+			<div><a href="#" onclick="getMore();">Get Content</a></div>
 		</div>
+		
+		<h2>Extensions</h2>
+		<div class="desc">A Example of Zaria using a extension</div>
+		<div class="textwrap">
+			<textarea id="ext-id" name="ext" style="width:520px; height:250px;"></textarea>
+			<div><a href="#" onclick="getExt();">Get Content</a></div>
+		</div>
+		
 		<script>
-			var options = {
-				layout: "<div class='zariaToolbar'>[bold][italic][underline][justify-left][justify-full][justify-center][justify-right][unordered-list][ordered-list][font][size][link][unlink][html]</div>[edit-area]",
+			var moreOptions = {
+				layout: "<div class='zariaToolbar'><div class='row'>[bold][italic][underline][justify-left][justify-full][justify-center][justify-right][unordered-list][ordered-list][font][size]</div><div class='row'>[link][unlink][html]</div></div>[edit-area]",
 				buttons: [
 						{name:'bold', label:'Bold', cmd:'bold', className:'bold'},
 						{name:'italic', label:'Italic', cmd:'italic', className:'italic'},
@@ -33,21 +53,49 @@
 						{name:'size', label:'Size', cmd:'fontsize', menu:[{label:'12pt', value:'3'},{label:'24pt', value:'6'},{label:'36pt', value:'7'}]},
 						{name:'link', label:'Link', cmd:'createlink', className:'link', prompt:"Enter your URL: "},
 						{name:'unlink', label:'Unlink', cmd:'unlink', className:'unlink'},
-						{name:'html', label:'html toggle', toggleMode: true, className:'html'}
+						{name:'html', label:'HTML Toggle', toggleMode: true, className:'html'}
 				],
 				cssOverride: 'textarea.css'
 			};
 
+			var extOptions = {
+				layout: "<div class='zariaToolbar'><div class='row'>[bold][italic][underline][justify-left][justify-full][justify-center][justify-right][unordered-list][ordered-list][font][size]</div><div class='row'>[link][unlink][backgroundcolor][html]</div></div>[edit-area]",
+				buttons: [
+						{name:'bold', label:'Bold', cmd:'bold', className:'bold'},
+						{name:'italic', label:'Italic', cmd:'italic', className:'italic'},
+						{name:'underline', label:'Underline', cmd:'underline', className:'underline'},
+						{name:'justify-left', label:'Align Left', cmd:'justifyleft', className:'justifyleft'},
+						{name:'justify-full', label:'Justify', cmd:'justifyfull', className:'justifyfull'},
+						{name:'justify-center', label:'Align Center', cmd:'justifycenter', className:'justifycenter'},
+						{name:'justify-right', label:'Align Right', cmd:'justifyright', className:'justifyright'},
+						{name:'unordered-list', label:'Unordered List', cmd:'insertunorderedlist', className:'insertunorderedlist'},
+						{name:'ordered-list', label:'Ordered List', cmd:'insertorderedlist', className:'insertorderedlist'},
+						{name:'font', label:'Font', cmd:'fontname', menu:[{label:'Arial', value:'Arial'},{label:'Courier', value:'Courier'},{label:'Times New Roman', value:'Times New Roman'}]},
+						{name:'size', label:'Size', cmd:'fontsize', menu:[{label:'12pt', value:'3'},{label:'24pt', value:'6'},{label:'36pt', value:'7'}]},
+						{name:'link', label:'Link', cmd:'createlink', className:'link', prompt:"Enter your URL: "},
+						{name:'unlink', label:'Unlink', cmd:'unlink', className:'unlink'},
+						{name:'html', label:'HTML Toggle', toggleMode: true, className:'html'},
+						{name:'backgroundcolor', label:'Background Color', className:'backgroundcolor', dialog: {src:'/ext/backgroundColor/dialog.html', width:'300px', height:'120px', position:'button'}}
+				],
+				cssOverride: 'textarea.css'
+			};
+			
 			var defaultArea = new Zaria('default-id');
 			function getDefault() {
 				defaultArea.syncContent();
 				alert(document.getElementById('default-id').value);
 			}
 
-			var content = new Zaria('content-id', options);
-			function getContent() {
-				content.syncContent();
-				alert(document.getElementById('content-id').value);
+			var more = new Zaria('more-id', moreOptions);
+			function getMore() {
+				more.syncContent();
+				alert(document.getElementById('more-id').value);
+			}
+
+			var ext = new Zaria('ext-id', extOptions);
+			function getExt() {
+				ext.syncContent();
+				alert(document.getElementById('ext-id').value);
 			}
 		</script>
 	</body>
