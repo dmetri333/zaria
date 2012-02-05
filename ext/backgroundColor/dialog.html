@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Background Color</title>
+		<style>
+			body { margin: 0; padding: 0; background-color: #FFF; font: 12px/14px Arial; }
+			.header { height: 18px; background-color: #CCC; font: 12px/18px Arial; padding: 0 10px; }
+			.header .close { float: right; font: 11px/16px Arial; color: #111; cursor: pointer; text-decoration: none; }
+			.content { overflow: hidden; padding: 5px; }
+			.content a { display: inline-block; width: 10px; height: 10px; margin: 0 1px 1px 0; float: left; border: 1px solid #808080; }
+		</style>
+		<script type="text/javascript">
+			var zaria = parent.document.zariaDialog;
+			var ea = parent.document.zariaDialog.ea;
+			
+			function init() {
+	
+				var namedColors=[
+					"#000000","#800000","#ff0000","#8b4513","#d2b48c","#b8860b","#556b2f","#006400","#2e8b57","#2f4f4f","#5f9ea0","#191970","#483d8b","#4b0082","#800080","#dc143c",
+					"#696969","#8b0000","#ff4500","#a0522d","#deb887","#daa520","#6b8e23","#008000","#3cb371","#008080","#00ced1","#000080","#4682b4","#8a2be2","#8b008b","#c71585",
+					"#808080","#a52a2a","#ff6347","#d2691e","#f5deb3","#bdb76b","#808000","#228b22","#8fbc8f","#008b8b","#00bfff","#00008b","#708090","#9932cc","#da70d6","#db7093",
+					"#a9a9a9","#b22222","#ff7f50","#cd853f","#ffdead","#f0e68c","#9acd32","#32cd32","#66cdaa","#20b2aa","#87cefa","#0000cd","#778899","#9400d3","#ee82ee","#ff1493",
+					"#c0c0c0","#cd5c5c","#ff8c00","#bc8f8f","#ffe4b5","#eee8aa","#ffd700","#00ff00","#00ff7f","#48d1cc","#87ceeb","#0000ff","#6a5acd","#ba55d3","#ff00ff","#ff69b4",
+					"#d3d3d3","#f08080","#f4a460","#e9967a","#ffebcd","#fffacd","#ffff00","#7cfc00","#00fa9a","#40e0d0","#add8e6","#4169e1","#7b68ee","#dda0dd","#ff00ff","#ffb6c1",
+					"#dcdcdc","#fa8072","#ffa500","#ffe4e1","#ffefd5","#fff8dc","#fafad2","#7fff00","#90ee90","#00ffff","#b0e0e6","#1e90ff","#9370db","#d8bfd8","#e6e6fa","#ffc0cb",
+					"#f5f5f5","#ffa07a","#ffdab9","#faebd7","#fdf5e6","#fffaf0","#ffffe0","#adff2f","#98fb98","#00ffff","#afeeee","#6495ed","#b0c4de","#f0ffff","#f8f8ff","#fff0f5",
+					"#fffafa","#ffe4c4","#fff5ee","#faf0e6","#fffff0","#f5f5dc","#f5fffa","#f0fff0","#7fffd4","#e0ffff","#f0f8ff","#ffffff"
+				]
+	
+				var namedColorTitles=[
+					"Black","Maroon","Red","SaddleBrown","Tan","DarkGoldenrod","DarkOliveGreen","DarkGreen","SeaGreen","DarkSlateGray","CadetBlue","MidnightBlue","DarkSlateBlue","Indigo","Purple","Crimson",
+					"DimGray","DarkRed","OrangeRed","Sienna","Burlywood","Goldenrod","OliveDrab","Green","MediumSeaGreen","Teal","DarkTurquoise","Navy","SteelBlue","BlueViolet","DarkMagenta","MediumVioletRed",
+					"Gray","Brown","Tomato","Chocolate","Wheat","DarkKhaki","Olive","ForestGreen","DarkSeaGreen","DarkCyan","DeepSkyBlue","DarkBlue","SlateGray","DarkOrchid","Orchid","PaleVioletRed",
+					"DarkGray","FireBrick","Coral","Peru","NavajoWhite","Khaki","YellowGreen","LimeGreen","MediumAquamarine","LightSeaGreen","LightSkyBlue","MediumBlue","LightSlateGray","DarkViolet","Violet","DeepPink",
+					"Silver","IndianRed","DarkOrange","RosyBrown","Moccasin","PaleGoldenrod","Gold","Lime","SpringGreen","MediumTurquoise","SkyBlue","Blue","SlateBlue","MediumOrchid","Fuchsia","HotPink",
+					"LightGrey","LightCoral","SandyBrown","DarkSalmon","BlanchedAlmond","LemonChiffon","Yellow","LawnGreen","MediumSpringGreen","Turquoise","LightBlue","RoyalBlue","MediumSlateBlue","Plum","Fuchsia","LightPink",
+					"Gainsboro","Salmon","Orange","MistyRose","PapayaWhip","Cornsilk","LightGoldenrodYellow","Chartreuse","LightGreen","Aqua","PowderBlue","DodgerBlue","MediumPurple","Thistle","Lavender","Pink",
+					"WhiteSmoke","LightSalmon","PeachPuff","AntiqueWhite","Oldlace","FloralWhite","LightYellow","GreenYellow","PaleGreen","Aqua","PaleTurquoise","CornflowerBlue","LightSteelBlue","Azure","GhostWhite","LavenderBlush",
+					"Snow","Bisque","Seashell","Linen","Ivory","Beige","MintCream","Honeydew","Aquamarine","LightCyan","AliceBlue","White"
+				]
+
+				var palette = document.getElementById('palette');
+				for (i = 0; i < namedColors.length; i++) {
+					palette.innerHTML += '<a title="'+namedColorTitles[i]+'" href="javascript:void(0);" onclick="highlight(\''+namedColors[i]+'\')" style="background:'+namedColors[i]+'"></a>';
+				}
+			}
+	
+			function highlight(color) {
+				var range;
+
+				if (ea.getSelection) {
+					// IE9 and non-IE
+					ea.focus();
+					ea.document.execCommand("HiliteColor", false, color)
+					ea.focus();
+				} else if (ea.document.selection && ea.document.selection.createRange) {
+					// IE <= 8 case
+					range = ea.document.selection.createRange();
+					range.execCommand("BackColor", false, color);
+				}
+				zaria.closeDialog();
+			}
+		</script>
+	</head>
+	<body onload="init();">
+		<div class="header">Select Background Color <a class="close" href="javascript:void(0);" onclick="zaria.closeDialog();">x</a></div>
+		<div id="palette" class="content"></div>
+	</body>
+</html>
